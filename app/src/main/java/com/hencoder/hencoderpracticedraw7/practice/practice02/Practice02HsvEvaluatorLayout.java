@@ -3,6 +3,7 @@ package com.hencoder.hencoderpracticedraw7.practice.practice02;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -48,10 +49,30 @@ public class Practice02HsvEvaluatorLayout extends RelativeLayout {
 
     private class HsvEvaluator implements TypeEvaluator<Integer> {
 
+        float start_hsv[] = new float[3];
+        float end_hsv[] = new float[3];
+
+        float out_hsv[] = new float[3];
+
+
         // 重写 evaluate() 方法，让颜色按照 HSV 来变化
         @Override
         public Integer evaluate(float fraction, Integer startValue, Integer endValue) {
-            return startValue;
+
+            //先将agb格式颜色转化为hsv格式
+            Color.colorToHSV(startValue, start_hsv);
+            Color.colorToHSV(endValue, end_hsv);
+
+            //进行比例运算
+            out_hsv[0] = start_hsv[0] + fraction * (end_hsv[0] - start_hsv[0]);
+            out_hsv[1] = start_hsv[1] + fraction * (end_hsv[1] - start_hsv[1]);
+            out_hsv[2] = start_hsv[2] + fraction * (end_hsv[2] - start_hsv[2]);
+
+
+            int alpha = startValue >> 24 + (int) ((endValue >> 24 - startValue >> 24) * fraction);
+
+            //再转化为rgb格式
+            return Color.HSVToColor(alpha, out_hsv);
         }
     }
 }
